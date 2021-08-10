@@ -1,0 +1,28 @@
+[package]
+name = "handlebars-repeat"
+version = "0.1.0"
+edition = "2018"
+authors = ["Nathaniel McCallum <npmccallum@redhat.com>"]
+license = "MIT"
+homepage = "https://github.com/npmccallum/handlebars-repeat"
+repository = "https://github.com/npmccallum/handlebars-repeat"
+description = "Block repetition helper for handlebars"
+readme = "README.md"
+keywords = ["handlebars", "repeat", "repetition", "helper"]
+categories = ["template-engine", "web-programming"]
+exclude = [ ".gitignore", ".github/*" ]
+
+[badges]
+# See https://doc.rust-lang.org/cargo/reference/manifest.html#the-badges-section
+github = { repository = "npmccallum/handlebars-repeat", workflow = "test" }
+#github = { repository = "npmccallum/handlebars-repeat", workflow = "lint" }
+maintenance = { status = "actively-developed" }
+is-it-maintained-issue-resolution = { repository = "npmccallum/handlebars-repeat" }
+is-it-maintained-open-issues = { repository = "npmccallum/handlebars-repeat" }
+
+[dev-dependencies]
+serde_json = "1.0"
+rstest = "0.11"
+
+[dependencies]
+handlebars = "4.1"
