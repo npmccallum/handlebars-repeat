@@ -82,7 +82,7 @@ pub struct RepeatHelper;
 impl HelperDef for RepeatHelper {
     fn call<'reg: 'rc, 'rc>(
         &self,
-        h: &Helper<'reg, 'rc>,
+        h: &Helper<'rc>,
         r: &'reg Handlebars<'reg>,
         ctx: &'rc Context,
         rc: &mut RenderContext<'reg, 'rc>,
@@ -90,19 +90,20 @@ impl HelperDef for RepeatHelper {
     ) -> HelperResult {
         let value = h
             .param(0)
-            .ok_or_else(|| RenderError::new("`repeat` helper: cannot read parameter `count`"))?
+            .ok_or_else(|| RenderErrorReason::ParamNotFoundForIndex("repeat", 0))?
             .value();
 
         let count = value.as_u64().ok_or_else(|| {
-            RenderError::new(format!(
-                "`repeat` helper: received {:?} instead of u64",
-                value
-            ))
+            RenderErrorReason::ParamTypeMismatchForName(
+                "repeat",
+                "0".to_string(),
+                "u64".to_string(),
+            )
         })?;
 
         let template = h
             .template()
-            .ok_or_else(|| RenderError::new("`repeat` helper: missing block"))?;
+            .ok_or_else(|| RenderErrorReason::BlockContentRequired)?;
 
         for i in 0..count {
             let mut block = rc.block().cloned().unwrap_or_default();
@@ -161,7 +162,10 @@ mod tests {
     fn missing_arg(#[case] count: u64) {
         let template = "{{#repeat}}{{name}}{{/repeat}}";
         let err = render(template, count).unwrap_err();
-        assert!(err.desc.contains("cannot read parameter"))
+        assert!(matches!(
+            err.reason(),
+            RenderErrorReason::ParamNotFoundForIndex("repeat", 0)
+        ))
     }
 
     #[rstest]
@@ -172,7 +176,13 @@ mod tests {
     fn wrong_arg_type(#[case] count: u64) {
         let template = "{{#repeat \"foo\"}}{{name}}{{/repeat}}";
         let err = render(template, count).unwrap_err();
-        assert!(err.desc.contains("instead of u64"))
+        assert!(
+            matches!(err.reason(), RenderErrorReason::ParamTypeMismatchForName(
+            "repeat",
+            a,
+            b,
+        ) if (a == &"0".to_string()) && b == &"u64".to_string())
+        )
     }
 
     #[rstest]
@@ -183,6 +193,9 @@ mod tests {
     fn missing_block(#[case] count: u64) {
         let template = "{{repeat count}}";
         let err = render(template, count).unwrap_err();
-        assert!(err.desc.contains("missing block"))
+        assert!(matches!(
+            err.reason(),
+            RenderErrorReason::BlockContentRequired
+        ))
     }
 }
