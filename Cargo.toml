@@ -11,6 +11,7 @@ readme = "README.md"
 keywords = ["handlebars", "repeat", "repetition", "helper"]
 categories = ["template-engine", "web-programming"]
 exclude = [ ".gitignore", ".github/*" ]
+rust-version = "1.66"
 
 [badges]
 # See https://doc.rust-lang.org/cargo/reference/manifest.html#the-badges-section
